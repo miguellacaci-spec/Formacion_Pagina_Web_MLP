@@ -1,8 +1,0 @@
-flask
-flask_sqlalchemy
-gunicorn
-pandas
-openpyxl
-requests
-python-dotenv
-
