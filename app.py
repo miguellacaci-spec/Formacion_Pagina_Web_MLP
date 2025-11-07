@@ -141,5 +141,5 @@ def logout():
 # --- ROUTES: APP ---
 @app.route('/')
 def home():
-    if current_user.is_authenticated:
-        return redirect('/')
+    return render_template('index.html')
+
