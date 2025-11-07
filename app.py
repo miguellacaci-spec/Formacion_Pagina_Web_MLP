@@ -44,3 +44,26 @@ def modo_carrera():
 def add_player():
     try:
         name = request.form['name']
+        age = int(request.form['age'])
+        nationality = request.form['nationality']
+        position = request.form['position']
+        grl = int(request.form['grl'])
+        matches = int(request.form.get('matches', 0))
+        goals = int(request.form.get('goals', 0))
+        assists = int(request.form.get('assists', 0))
+        market_value = float(request.form['market_value'])
+        salary = float(request.form['salary'])
+
+        new_player = Player(
+            name=name, age=age, nationality=nationality, position=position,
+            grl=grl, matches=matches, goals=goals, assists=assists,
+            market_value=market_value, salary=salary
+        )
+        db.session.add(new_player)
+        db.session.commit()
+        flash("Jugador añadido correctamente ✅", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al agregar jugador: {e}", "danger")
+
+    return redirect('/modo_carrera')
