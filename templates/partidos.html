@@ -1,5 +1,31 @@
 {% extends "layout.html" %}
 {% block content %}
 <h2 class="fw-bold mb-4 text-center">Partidos Relevantes</h2>
-<p class="text-center">Aquí podrás ver los próximos partidos, cuotas y análisis.</p>
+
+{% if partidos %}
+<div class="table-responsive">
+<table class="table table-dark table-hover text-center shadow">
+    <thead>
+        <tr>
+            <th>Local</th>
+            <th>Visitante</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in partidos %}
+        <tr>
+            <td>{{ p.local }}</td>
+            <td>{{ p.visitante }}</td>
+            <td>{{ p.fecha }}</td>
+            <td>{{ p.hora }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<p class="text-center text-muted">No hay partidos añadidos todavía.</p>
+{% endif %}
 {% endblock %}
