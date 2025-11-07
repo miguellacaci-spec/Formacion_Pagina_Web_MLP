@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Modo Carrera</title></head>
+<body>
+  <h1>Modo Carrera</h1>
+  <a href="/">Inicio</a> | <a href="/export/plantilla.xlsx">Exportar plantilla (XLSX)</a>
+  <h2>Jugadores</h2>
+  <table border="1">
+    <tr><th>Nombre</th><th>Edad</th><th>Pos</th><th>Valor</th><th>Salario</th></tr>
+    {% for p in players %}
+      <tr>
+        <td>{{p.name}}</td>
+        <td>{{p.age}}</td>
+        <td>{{p.position}}</td>
+        <td>{{p.market_value}}</td>
+        <td>{{p.salary}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
