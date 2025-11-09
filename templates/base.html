@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fútbol Manager{% endblock %}</title>
+    <!-- Incluye Tailwind CSS para estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración de Tailwind para usar la fuente Inter -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6f8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Barra de Navegación -->
+    <nav class="bg-gray-900 shadow-xl sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo/Título -->
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0 text-white text-xl font-bold tracking-wider rounded-lg p-1 transition duration-200 hover:text-green-400">
+                        <span class="text-green-500 text-2xl font-extrabold mr-1">FUT</span> Manager
+                    </a>
+                </div>
+                
+                <!-- Menú de Navegación -->
+                <div class="flex items-center space-x-4">
+                    {% if session.user_id %}
+                        <a href="/" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-150">Inicio</a>
+                        <a href="/modo_carrera" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-150">Modo Carrera</a>
+                        <a href="/partidos" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-150">Partidos</a>
+                        
+                        <!-- Botón de Logout -->
+                        <a href="/logout" 
+                           class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg hover:bg-red-700 transition duration-200 transform hover:scale-105">
+                           Cerrar Sesión
+                        </a>
+                    {% else %}
+                        <a href="/login" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-150">Iniciar Sesión</a>
+                        <a href="/register" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg hover:bg-green-700 transition duration-200 transform hover:scale-105">Registrarse</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-4 mt-auto">
+        <div class="max-w-7xl mx-auto text-center text-sm text-gray-400">
+            &copy; 2024 FUT Manager App. Todos los derechos reservados.
+        </div>
+    </footer>
+
+</body>
+</html>
