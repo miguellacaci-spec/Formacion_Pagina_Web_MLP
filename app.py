@@ -1,18 +1,45 @@
 from flask import Flask, render_template, request, redirect, session
-from flask import Flask, render_template, request, redirect, session
 import sqlite3, os
 from werkzeug.security import generate_password_hash, check_password_hash
-# NOTA: Ya no importamos 'init_db' aquí porque Render lo ejecuta por separado.
+# NOTA: Eliminamos la importación de init_db, ya que la lógica está ahora aquí.
 
 app = Flask(__name__)
-# ¡IMPORTANTE! Cambia esta clave secreta a algo largo y complejo antes de desplegar en producción.
+# ¡IMPORTANTE! Cambia esta clave secreta a algo largo y complejo antes de desplegar.
 app.secret_key = "clave_super_segura_y_larga_para_la_session" 
 
-# --- Función auxiliar para la conexión a la base de datos ---
+# --- Función auxiliar para la conexión a la base de datos (AHORA CON CREACIÓN DE TABLAS) ---
 def get_db_connection():
-    # Render usa el archivo data.db que fue creado en la fase de "Build"
+    # Conexión a la base de datos
     conn = sqlite3.connect('data.db')
     conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    # 1. Creamos la tabla de Usuarios (si no existe)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    """)
+
+    # 2. Creamos la tabla de Jugadores (si no existe)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS players (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            position TEXT NOT NULL,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            nationality TEXT NOT NULL,
+            grl INTEGER NOT NULL,
+            market_value TEXT,
+            salary TEXT,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    """)
+    
+    conn.commit()
     return conn
 
 # --- Home ---
@@ -35,19 +62,25 @@ def register():
         username = request.form['username']
         password = request.form['password']
         
-        # Seguridad: Hashing de la contraseña antes de guardarla
+        # Seguridad: Hashing de la contraseña
         hashed_password = generate_password_hash(password)
         
+        # Intentamos obtener la conexión y la tabla se crea si no existe
         conn = get_db_connection()
         try:
             conn.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
             conn.commit()
         except sqlite3.IntegrityError:
             error = "❌ El nombre de usuario ya existe. Por favor, elige otro."
+        except Exception as e:
+            # Captura un error genérico, crucial para depurar el 500
+            print(f"Error al registrar usuario: {e}") 
+            error = "❌ Error interno del servidor al registrar. Inténtalo de nuevo."
         finally:
             conn.close()
         
-        if not error:
+        if not error and request.form.get('register') == 'true':
+            # Solo redirigir si el registro fue exitoso y es la acción POST
             return redirect('/login')
             
     return render_template('register.html', error=error)
@@ -61,11 +94,9 @@ def login():
         password = request.form['password']
         conn = get_db_connection()
         
-        # 1. Buscamos al usuario por el nombre de usuario y obtenemos su hash
         user = conn.execute("SELECT id, password FROM users WHERE username=?", (username,)).fetchone()
         conn.close()
 
-        # 2. Verificamos si el usuario existe y si la contraseña coincide con el hash almacenado
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             return redirect('/')
@@ -93,7 +124,6 @@ def modo_carrera():
         try:
             position = request.form['position']
             name = request.form['name']
-            # Intentamos convertir a entero. Esto puede fallar si el usuario introduce texto.
             age = int(request.form['age'])
             nationality = request.form['nationality']
             grl = int(request.form['grl'])
@@ -107,15 +137,13 @@ def modo_carrera():
             conn.commit()
             message = "✅ Jugador añadido exitosamente."
         except ValueError:
-            # Capturamos el error si 'age' o 'grl' no son números válidos
             message = "⚠️ Error: La Edad y el GRL deben ser números enteros válidos."
         except Exception as e:
-            # Error genérico de base de datos u otro
             message = f"❌ Error al añadir jugador: {str(e)}"
             print(f"Error adding player: {e}")
 
 
-    # Fetch players for the current user, ordered by GRL
+    # Obtiene los jugadores del usuario actual, ordenados por GRL
     players = conn.execute('SELECT * FROM players WHERE user_id=? ORDER BY grl DESC, name ASC', (session['user_id'],)).fetchall()
     conn.close()
     
@@ -130,5 +158,5 @@ def partidos():
 
 # --- Ejecución Local / Producción ---
 if __name__ == '__main__':
-    # Usado solo para desarrollo local, ignorado por Gunicorn en Render
+    # Solo para desarrollo local
     app.run(host='0.0.0.0', port=5000, debug=True)
