@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Modo Carrera{% endblock %}
+
+{% block content %}
+<h1 class="text-4xl font-extrabold text-gray-900 mb-8 border-b pb-2">Gestión de Plantilla</h1>
+
+{% if message %}
+<div class="{% if '✅' in message %}bg-green-100 border-green-400 text-green-700{% elif '⚠️' in message %}bg-yellow-100 border-yellow-400 text-yellow-700{% else %}bg-red-100 border-red-400 text-red-700{% endif %} px-4 py-3 rounded-lg border mb-6 text-sm font-medium" role="alert">
+    {{ message }}
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Columna Izquierda: Formulario de Fichaje -->
+    <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg h-fit sticky top-20">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 text-green-600">Fichar Nuevo Jugador</h2>
+        
+        <form method="POST" action="/modo_carrera" class="space-y-4">
+            
+            <!-- Posición -->
+            <div>
+                <label for="position" class="block text-sm font-medium text-gray-700">Posición</label>
+                <select id="position" name="position" required
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150">
+                    <option value="POR">Portero (POR)</option>
+                    <option value="DEF">Defensa (DEF)</option>
+                    <option value="MED">Mediocampista (MED)</option>
+                    <option value="DEL">Delantero (DEL)</option>
+                </select>
+            </div>
+
+            <!-- Nombre -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nombre del Jugador</label>
+                <input type="text" id="name" name="name" required
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+
+            <!-- Edad -->
+            <div>
+                <label for="age" class="block text-sm font-medium text-gray-700">Edad</label>
+                <input type="number" id="age" name="age" required min="16" max="45"
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+
+            <!-- Nacionalidad -->
+            <div>
+                <label for="nationality" class="block text-sm font-medium text-gray-700">Nacionalidad</label>
+                <input type="text" id="nationality" name="nationality" required
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+
+            <!-- GRL (Valoración General) -->
+            <div>
+                <label for="grl" class="block text-sm font-medium text-gray-700">GRL (0-99)</label>
+                <input type="number" id="grl" name="grl" required min="1" max="99"
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+            
+            <!-- Valor de Mercado -->
+            <div>
+                <label for="market_value" class="block text-sm font-medium text-gray-700">Valor de Mercado (€)</label>
+                <input type="text" id="market_value" name="market_value" required placeholder="Ej: 5M o 100K"
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+
+            <!-- Salario -->
+            <div>
+                <label for="salary" class="block text-sm font-medium text-gray-700">Salario Semanal (€)</label>
+                <input type="text" id="salary" name="salary" required placeholder="Ej: 50K"
+                       class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+
+            <button type="submit"
+                    class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50">
+                Fichar
+            </button>
+        </form>
+    </div>
+
+    <!-- Columna Derecha: Tabla de Jugadores -->
+    <div class="lg:col-span-2">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Tu Plantilla Actual ({{ players | length }})</h2>
+
+        {% if players %}
+        <div class="overflow-x-auto bg-white rounded-xl shadow-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nombre</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Posición</th>
+                        <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">GRL</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Edad</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Valor (€)</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Salario (€)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for player in players %}
+                    <tr class="hover:bg-gray-50 transition duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ player.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if player.position == 'POR' %} bg-blue-100 text-blue-800
+                                {% elif player.position == 'DEF' %} bg-red-100 text-red-800
+                                {% elif player.position == 'MED' %} bg-yellow-100 text-yellow-800
+                                {% else %} bg-green-100 text-green-800 {% endif %}">
+                                {{ player.position }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-center text-green-600">{{ player.grl }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ player.age }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ player.market_value }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ player.salary }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg shadow-inner">
+            <p class="text-sm text-yellow-800">No tienes jugadores en tu plantilla. ¡Usa el formulario de la izquierda para fichar a tu primera estrella!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
