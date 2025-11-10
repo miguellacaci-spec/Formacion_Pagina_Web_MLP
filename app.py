@@ -1,4 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session from flask_sqlalchemy import SQLAlchemy from werkzeug.security import generate_password_hash, check_password_hash # Para contraseñas seguras import os
+from flask import Flask, render_template, request, redirect, url_for, flash, session 
+from flask_sqlalchemy import SQLAlchemy 
+from werkzeug.security import generate_password_hash, check_password_hash # Para contraseñas seguras 
+import os
+
 app = Flask(__name__)
 # Usamos una clave secreta para la gestión de sesiones
 app.secret_key = "clave_secreta_super_segura_2024_proyectoflask"
@@ -6,7 +10,9 @@ app.secret_key = "clave_secreta_super_segura_2024_proyectoflask"
 # CONFIGURACIÓN BASE DE DATOS
 # =========================================
 # La base de datos debe ser única por usuario/entorno
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///manager_career.db' app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///manager_career.db' 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+db = SQLAlchemy(app)
 # =========================================
 # MODELOS
 # =========================================
@@ -188,8 +194,7 @@ def modo_carrera():
         'position': p.posicion,
         'grl': p.grl,
         'age': p.edad,
-        'market_value': 
-        p.market_value,
+        'market_value': p.market_value,
         'salary': p.salary} for p in jugadores_ordenados]
         
     return render_template('modo_carrera.html', players=players_data, message=message, username=session.get('usuario', 'Manager'))
