@@ -104,30 +104,30 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         {% for jugador in players %}
                         <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ jugador.name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-semibold">{{ jugador.position }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ jugador['name'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-semibold">{{ jugador['position'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-bold 
-                                {% if jugador.grl >= 85 %} text-green-600 
-                                {% elif jugador.grl >= 75 %} text-yellow-600 
+                                {% if jugador['grl'] >= 85 %} text-green-600 
+                                {% elif jugador['grl'] >= 75 %} text-yellow-600 
                                 {% else %} text-gray-500 
                                 {% endif %}">
-                                {{ jugador.grl }}
+                                {{ jugador['grl'] }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.age }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ jugador.market_value }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ jugador.salary }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador['age'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ jugador['market_value'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ jugador['salary'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                 
                                 <button type="button"
-                                        onclick="openEditModal({{ jugador.id }}, '{{ jugador.name | safe }}', '{{ jugador.position }}', '{{ jugador.grl }}', '{{ jugador.age }}', '{{ jugador.market_value | safe }}', '{{ jugador.salary | safe }}')"
+                                        onclick="openEditModal({{ jugador['id'] }}, '{{ jugador['name'] | safe }}', '{{ jugador['position'] }}', '{{ jugador['grl'] }}', '{{ jugador['age'] }}', '{{ jugador['market_value'] | safe }}', '{{ jugador['salary'] | safe }}')"
                                         class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150">
                                     Modificar
                                 </button>
                                 
                                 <form method="POST" 
-                                      action="{{ url_for('eliminar_jugador', player_id=jugador.id) }}" 
+                                      action="{{ url_for('eliminar_jugador', player_id=jugador['id']) }}" 
                                       class="inline-block" 
-                                      onsubmit="return confirm('¿Estás seguro de que quieres vender/eliminar a {{ jugador.name }}?')">
+                                      onsubmit="return confirm('¿Estás seguro de que quieres vender/eliminar a {{ jugador['name'] }}?')">
                                     <button type="submit"
                                             class="text-red-600 hover:text-red-900 transition duration-150">
                                         Eliminar
