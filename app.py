@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session 
 from flask_sqlalchemy import SQLAlchemy 
 from werkzeug.security import generate_password_hash, check_password_hash # Para contraseñas seguras 
-import os
+import os # Necesario para leer variables de entorno
 
 app = Flask(__name__)
 # Usamos una clave secreta para la gestión de sesiones
@@ -9,42 +9,59 @@ app.secret_key = "clave_secreta_super_segura_2024_proyectoflask"
 # =========================================
 # CONFIGURACIÓN BASE DE DATOS
 # =========================================
-# La base de datos debe ser única por usuario/entorno
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///manager_career.db' 
+
+# 1. Intentamos leer la URL de la base de datos desde una variable de entorno
+#    Esto es lo que usará Render (DATABASE_URL es el nombre estándar)
+# 2. Si no existe (ej. desarrollo local), usamos SQLite
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Si es PostgreSQL, SQLAlchemy a veces necesita el esquema 'postgres://' cambiado a 'postgresql://'
+    # Esta línea asegura la compatibilidad con algunos proveedores
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    # Modo de desarrollo local con SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///manager_career.db' 
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 db = SQLAlchemy(app)
+
+# =========================================
+# ... (El resto del código de modelos, rutas, etc., va aquí y no necesita cambios)
+# =========================================
+
 # =========================================
 # MODELOS
 # =========================================
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     usuario = db.Column(db.String(100), nullable=False, unique=True)
-    # Almacenamos el hash de la contraseña en lugar de la contraseña simple
     contraseña_hash = db.Column(db.String(128), nullable=False)
-    # Relación con Jugadores (para gestión multiusuario)
     jugadores = db.relationship('Jugador', backref='manager', lazy=True)
 
     def set_password(self, password):
-        """Genera el hash de la contraseña para almacenarla de forma segura."""
         self.contraseña_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        """Verifica si la contraseña dada coincide con el hash almacenado."""
         return check_password_hash(self.contraseña_hash, password)
 
 class Jugador(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    # Clave foránea para vincular al jugador con el usuario logueado
     user_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     nombre = db.Column(db.String(100), nullable=False)
     posicion = db.Column(db.String(50), nullable=False)
-    grl = db.Column(db.Integer, nullable=False) # media -> grl
-    edad = db.Column(db.Integer, nullable=False) # nuevo campo
-    market_value = db.Column(db.String(50), nullable=False) # valor -> market_value
-    salary = db.Column(db.String(50), nullable=False) # nuevo campo
+    grl = db.Column(db.Integer, nullable=False)
+    edad = db.Column(db.Integer, nullable=False)
+    market_value = db.Column(db.String(50), nullable=False)
+    salary = db.Column(db.String(50), nullable=False)
 
 with app.app_context():
     db.create_all()
+
+# ... (Continúa con la función 'ordenar_jugadores', rutas, etc.)
 
 # =========================================
 # LÓGICA DE ORDENACIÓN (PARA EL PUNTO 2)
@@ -78,9 +95,7 @@ def ordenar_jugadores(jugadores):
 @app.route('/')
 def home():
     if 'user_id' not in session:
-        # Si no hay sesión, redirige al login (Requisito 1: pedir registro o inicio de sesión)
         return redirect(url_for('login'))
-    # Si hay sesión, muestra el home (el menú principal)
     username = session.get('usuario', 'Manager')
     return render_template('home.html', username=username)
 
@@ -94,12 +109,10 @@ def login():
         contraseña_req = request.form['contraseña']
 
         user = Usuario.query.filter_by(usuario=usuario_req).first()
-        # Usamos check_password para verificar el hash de forma segura
         if user and user.check_password(contraseña_req):
             session['user_id'] = user.id
             session['usuario'] = usuario_req
             flash("✅ Inicio de sesión exitoso", "success")
-            # Redirige a home para que pueda elegir entre modo carrera o partidos
             return redirect(url_for('home'))
         else:
             flash("❌ Usuario o contraseña incorrectos", "error")
@@ -115,20 +128,17 @@ def register():
         usuario_req = request.form['usuario']
         contraseña_req = request.form['contraseña']
 
-        # Evitar duplicados
         existente = Usuario.query.filter_by(usuario=usuario_req).first()
         if existente:
             flash("⚠️ El nombre de usuario ya existe. Prueba con otro.", "error")
             return redirect(url_for('register'))
 
         nuevo_usuario = Usuario(usuario=usuario_req)
-        # Almacenamos el hash de la contraseña
         nuevo_usuario.set_password(contraseña_req)
         
         db.session.add(nuevo_usuario)
         db.session.commit()
         flash("✅ Registro completado con éxito. Ahora puedes iniciar sesión.", "success")
-        # Redirige al login, que a su vez llevará al home si el inicio de sesión es exitoso
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -155,7 +165,6 @@ def modo_carrera():
     message = None
     
     if request.method == 'POST':
-        # Lógica para Añadir Jugador (POST)
         try:
             nombre = request.form['name'] 
             posicion = request.form['position']
@@ -164,7 +173,6 @@ def modo_carrera():
             market_value = request.form['market_value'] 
             salary = request.form['salary'] 
             
-            # **NOTA DE ROBUSTEZ:** Envoltura explícita de int() para asegurar que los campos son numéricos
             nuevo_jugador = Jugador(
                 user_id=user_id,
                 nombre=nombre, 
@@ -179,12 +187,10 @@ def modo_carrera():
             message = "✅ Jugador agregado correctamente."
 
         except ValueError:
-            # Captura si 'grl' o 'edad' no son números (el error más común)
             db.session.rollback()
             message = "❌ Error de datos: GRL y Edad deben ser números enteros válidos."
         except Exception as e:
             db.session.rollback()
-            # Captura cualquier otro error de base de datos o interno
             message = f"❌ Error interno: No se pudo agregar el jugador. {e}"
             
     # Lógica para Mostrar Jugadores (GET)
@@ -192,7 +198,6 @@ def modo_carrera():
         jugadores = Jugador.query.filter_by(user_id=user_id).all()
         jugadores_ordenados = ordenar_jugadores(jugadores)
         
-        # Generamos los datos de la forma más robusta posible
         players_data = [{
             'id': p.id,
             'name': p.nombre,
@@ -204,7 +209,7 @@ def modo_carrera():
             
         return render_template('modo_carrera.html', players=players_data, message=message, username=session.get('usuario', 'Manager'))
     except Exception as e:
-        # Esto captura errores al acceder a la DB (ej. tabla corrupta)
+        # Mensaje de error personalizado por fallo de DB
         flash(f"❌ Error al cargar la plantilla. La base de datos no está disponible. Intenta registrarte de nuevo.", "error")
         print(f"Database Load Error: {e}")
         return redirect(url_for('home'))
@@ -236,7 +241,6 @@ def actualizar_jugador(player_id):
     jugador = Jugador.query.filter_by(id=player_id, user_id=session['user_id']).first()
     if jugador and request.method == 'POST':
         try:
-            # Los nombres de los campos vienen del modal JS en el HTML
             jugador.posicion = request.form['position']
             jugador.grl = int(request.form['grl'])
             jugador.edad = int(request.form['age'])
@@ -274,7 +278,8 @@ def partidos():
 # =========================================
 # EJECUCIÓN LOCAL
 # =========================================
-if __name__ == '__main__': # Usamos un modo 'debug' en desarrollo
+if __name__ == '__main__': 
     with app.app_context():
-        db.create_all()
+        # En producción, esta línea solo crea las tablas la primera vez que se ejecuta.
+        db.create_all() 
     app.run(host='0.0.0.0', port=5000, debug=True)
