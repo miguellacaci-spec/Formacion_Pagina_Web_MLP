@@ -1,162 +1,132 @@
-from flask import Flask, render_template, request, redirect, session
-import sqlite3, os
-from werkzeug.security import generate_password_hash, check_password_hash
-# NOTA: Eliminamos la importación de init_db, ya que la lógica está ahora aquí.
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
-# ¡IMPORTANTE! Cambia esta clave secreta a algo largo y complejo antes de desplegar.
-app.secret_key = "clave_super_segura_y_larga_para_la_session" 
+app.secret_key = "clave_secreta_segura"
 
-# --- Función auxiliar para la conexión a la base de datos (AHORA CON CREACIÓN DE TABLAS) ---
-def get_db_connection():
-    # Conexión a la base de datos
-    conn = sqlite3.connect('data.db')
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    # 1. Creamos la tabla de Usuarios (si no existe)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    """)
+# Configuración base de datos (SQLite local, compatible con Render)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jugadores.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # 2. Creamos la tabla de Jugadores (si no existe)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS players (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            position TEXT NOT NULL,
-            name TEXT NOT NULL,
-            age INTEGER NOT NULL,
-            nationality TEXT NOT NULL,
-            grl INTEGER NOT NULL,
-            market_value TEXT,
-            salary TEXT,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    """)
-    
-    conn.commit()
-    return conn
+db = SQLAlchemy(app)
 
-# --- Home ---
+# =========================================
+# MODELO DE DATOS
+# =========================================
+class Jugador(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    posicion = db.Column(db.String(50), nullable=False)
+    media = db.Column(db.Integer, nullable=False)
+    valor = db.Column(db.String(50), nullable=False)
+
+with app.app_context():
+    db.create_all()
+
+# =========================================
+# RUTAS PRINCIPALES
+# =========================================
 @app.route('/')
 def home():
-    if 'user_id' not in session:
-        return redirect('/login')
-    
-    conn = get_db_connection()
-    user = conn.execute("SELECT username FROM users WHERE id=?", (session['user_id'],)).fetchone()
-    conn.close()
+    return render_template('home.html')
 
-    return render_template('home.html', username=user['username'] if user else 'Manager')
-
-# --- Registro ---
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    error = None
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        # Seguridad: Hashing de la contraseña
-        hashed_password = generate_password_hash(password)
-        
-        # Intentamos obtener la conexión y la tabla se crea si no existe
-        conn = get_db_connection()
-        try:
-            conn.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
-            conn.commit()
-        except sqlite3.IntegrityError:
-            error = "❌ El nombre de usuario ya existe. Por favor, elige otro."
-        except Exception as e:
-            # Captura un error genérico, crucial para depurar el 500
-            print(f"Error al registrar usuario: {e}") 
-            error = "❌ Error interno del servidor al registrar. Inténtalo de nuevo."
-        finally:
-            conn.close()
-        
-        if not error and request.form.get('register') == 'true':
-            # Solo redirigir si el registro fue exitoso y es la acción POST
-            return redirect('/login')
-            
-    return render_template('register.html', error=error)
-
-# --- Login ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = get_db_connection()
-        
-        user = conn.execute("SELECT id, password FROM users WHERE username=?", (username,)).fetchone()
-        conn.close()
-
-        if user and check_password_hash(user['password'], password):
-            session['user_id'] = user['id']
-            return redirect('/')
+        usuario = request.form['usuario']
+        contraseña = request.form['contraseña']
+        # Aquí pondrías tu validación de usuario real
+        if usuario == "admin" and contraseña == "admin":
+            session['usuario'] = usuario
+            return redirect(url_for('modo_carrera'))
         else:
-            error = "❌ Usuario o contraseña incorrectos"
-            
-    return render_template('login.html', error=error)
+            flash("Usuario o contraseña incorrectos", "error")
+    return render_template('login.html')
 
-# --- Logout ---
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        usuario = request.form['usuario']
+        contraseña = request.form['contraseña']
+        # Aquí podrías guardar el usuario si tienes un modelo de usuarios
+        flash("Registro completado con éxito. Ahora puedes iniciar sesión.", "success")
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
 @app.route('/logout')
 def logout():
-    session.clear()
-    return redirect('/login')
+    session.pop('usuario', None)
+    return redirect(url_for('home'))
 
-# --- Modo Carrera ---
-@app.route('/modo_carrera', methods=['GET', 'POST'])
+# =========================================
+# MODO CARRERA - CRUD DE JUGADORES
+# =========================================
+@app.route('/modo_carrera')
 def modo_carrera():
-    if 'user_id' not in session:
-        return redirect('/login')
+    jugadores = Jugador.query.all()
+    return render_template('modo_carrera.html', jugadores=jugadores)
 
-    conn = get_db_connection()
-    message = None 
+@app.route('/agregar_jugador', methods=['GET', 'POST'])
+def agregar_jugador():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        posicion = request.form['posicion']
+        media = request.form['media']
+        valor = request.form['valor']
+
+        nuevo_jugador = Jugador(nombre=nombre, posicion=posicion, media=media, valor=valor)
+        db.session.add(nuevo_jugador)
+        db.session.commit()
+        flash("Jugador agregado correctamente", "success")
+        return redirect(url_for('modo_carrera'))
+
+    return render_template('agregar_jugador.html')
+
+# =========================================
+# ELIMINAR JUGADOR (ARREGLADO PARA RENDER)
+# =========================================
+@app.route('/eliminar/<int:id>', methods=['POST'])
+def eliminar(id):
+    jugador = Jugador.query.get(id)
+    if jugador:
+        db.session.delete(jugador)
+        db.session.commit()
+        flash("Jugador eliminado correctamente", "success")
+    else:
+        flash("Jugador no encontrado", "error")
+    return redirect(url_for('modo_carrera'))
+
+# =========================================
+# MODIFICAR JUGADOR (ARREGLADO PARA RENDER)
+# =========================================
+@app.route('/modificar/<int:id>', methods=['GET', 'POST'])
+def modificar(id):
+    jugador = Jugador.query.get(id)
+    if not jugador:
+        flash("Jugador no encontrado", "error")
+        return redirect(url_for('modo_carrera'))
 
     if request.method == 'POST':
-        try:
-            position = request.form['position']
-            name = request.form['name']
-            age = int(request.form['age'])
-            nationality = request.form['nationality']
-            grl = int(request.form['grl'])
-            market_value = request.form['market_value']
-            salary = request.form['salary']
+        jugador.nombre = request.form['nombre']
+        jugador.posicion = request.form['posicion']
+        jugador.media = request.form['media']
+        jugador.valor = request.form['valor']
+        db.session.commit()
+        flash("Jugador modificado correctamente", "success")
+        return redirect(url_for('modo_carrera'))
 
-            conn.execute('''
-                INSERT INTO players (user_id, position, name, age, nationality, grl, market_value, salary)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (session['user_id'], position, name, age, nationality, grl, market_value, salary))
-            conn.commit()
-            message = "✅ Jugador añadido exitosamente."
-        except ValueError:
-            message = "⚠️ Error: La Edad y el GRL deben ser números enteros válidos."
-        except Exception as e:
-            message = f"❌ Error al añadir jugador: {str(e)}"
-            print(f"Error adding player: {e}")
+    return render_template('modificar_jugador.html', jugador=jugador)
 
-
-    # Obtiene los jugadores del usuario actual, ordenados por GRL
-    players = conn.execute('SELECT * FROM players WHERE user_id=? ORDER BY grl DESC, name ASC', (session['user_id'],)).fetchall()
-    conn.close()
-    
-    return render_template('modo_carrera.html', players=players, message=message)
-
-# --- Partidos ---
+# =========================================
+# PARTIDOS (opcional, ejemplo)
+# =========================================
 @app.route('/partidos')
 def partidos():
-    if 'user_id' not in session:
-        return redirect('/login')
     return render_template('partidos.html')
 
-# --- Ejecución Local / Producción ---
+# =========================================
+# EJECUCIÓN LOCAL
+# =========================================
 if __name__ == '__main__':
-    # Solo para desarrollo local
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
