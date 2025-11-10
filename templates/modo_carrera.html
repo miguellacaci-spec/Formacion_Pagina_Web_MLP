@@ -1,223 +1,216 @@
-{% extends "base.html" %}
-
-{% block title %}Modo Carrera{% endblock %}
+{% extends "base.html" %} 
+{% block title %}Modo Carrera | Gestión de Plantilla{% endblock %} 
 
 {% block content %}
-<h1 class="text-4xl font-extrabold text-gray-900 mb-8 border-b pb-2">Gestión de Plantilla</h1>
+<div class="py-6">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-6 border-b pb-2">
+        Gestión de Plantilla<span class="text-secondary ml-2">Manager: {{ username | default('Manager') }}</span>
+    </h1>
 
-{% if message %}
-<div class="{% if '✅' in message %}bg-green-100 border-green-400 text-green-700{% elif '⚠️' in message %}bg-yellow-100 border-yellow-400 text-yellow-700{% else %}bg-red-100 border-red-400 text-red-700{% endif %} px-4 py-3 rounded-lg border mb-6 text-sm font-medium" role="alert">
-    {{ message }}
-</div>
-{% endif %}
-
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    
-    <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-2xl h-fit sticky top-6 border border-gray-100">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 text-blue-600">Añadir Nuevo Jugador</h2>
+    <div class="lg:grid lg:grid-cols-3 lg:gap-8">
         
-        <form method="POST" action="/agregar_jugador" class="space-y-4">
+        <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-2xl h-fit sticky top-20 border border-gray-100 mb-8 lg:mb-0">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 text-primary">Añadir Nuevo Jugador</h2>
             
-            <div>
-                <label for="position" class="block text-sm font-medium text-gray-700">Posición</label>
-                <select id="position" name="posicion" required
-                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150">
-                    <option value="POR">Portero (POR)</option>
-                    <option value="CAI">Carrilero Izq. (CAI)</option>
-                    <option value="LI">Lateral Izq. (LI)</option>
-                    <option value="DFC">Defensa (DFC)</option>
-                    <option value="LD">Lateral Der. (LD)</option>
-                    <option value="CAD">Carrilero Der. (CAD)</option>
-                    <option value="MCD">Medio Defensivo (MCD)</option>
-                    <option value="MC">Mediocentro (MC)</option>
-                    <option value="MCO">Medio Ofensivo (MCO)</option>
-                    <option value="MI">Medio Izq. (MI)</option>
-                    <option value="MD">Medio Der. (MD)</option>
-                    <option value="EI">Extremo Izq. (EI)</option>
-                    <option value="DC">Delantero (DC)</option>
-                    <option value="SD">Segundo Delantero (SD)</option>
-                    <option value="ED">Extremo Der. (ED)</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Nombre del Jugador</label>
-                <input type="text" id="name" name="nombre" required
-                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="age" class="block text-sm font-medium text-gray-700">Edad</label>
-                <input type="number" id="age" name="edad" required min="16" max="45"
-                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="grl" class="block text-sm font-medium text-gray-700">GRL (0-99)</label>
-                <input type="number" id="grl" name="media" required min="1" max="99"
-                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-            </div>
+            <form method="POST" action="{{ url_for('modo_carrera') }}" class="space-y-4">
+                <div>
+                    <label for="position" class="block text-sm font-medium text-gray-700">Posición</label>
+                    <select id="position" name="position" required
+                            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                        <option value="POR">Portero (POR)</option>
+                        <option value="LD">Lateral Derecho (LD)</option>
+                        <option value="DFC">Defensa Central (DFC)</option>
+                        <option value="LI">Lateral Izquierdo (LI)</option>
+                        <option value="MCD">Mediocentro Defensivo (MCD)</option>
+                        <option value="MC">Mediocentro (MC)</option>
+                        <option value="MCO">Mediocentro Ofensivo (MCO)</option>
+                        <option value="MD">Interior Derecho (MD)</option>
+                        <option value="MI">Interior Izquierdo (MI)</option>
+                        <option value="SD">Segundo Delantero (SD)</option>
+                        <option value="DC">Delantero Centro (DC)</option>
+                        <option value="EI">Extremo Izquierdo (EI)</option>
+                        <option value="ED">Extremo Derecho (ED)</option>
+                        <option value="CAI">Carrilero Izquierdo (CAI)</option>
+                        <option value="CAD">Carrilero Derecho (CAD)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nombre del Jugador</label>
+                    <input type="text" id="name" name="name" required
+                            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary"
+                            placeholder="Ej: Mbappé">
+                </div>
+                
+                <div>
+                    <label for="age" class="block text-sm font-medium text-gray-700">Edad</label>
+                    <input type="number" id="age" name="age" required min="16" max="45"
+                            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary"
+                            placeholder="Ej: 25">
+                </div>
+                
+                <div>
+                    <label for="grl" class="block text-sm font-medium text-gray-700">GRL (0-99)</label>
+                    <input type="number" id="grl" name="grl" required min="1" max="99"
+                            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary"
+                            placeholder="Ej: 92">
+                </div>
+                
+                <div>
+                    <label for="market_value" class="block text-sm font-medium text-gray-700">Valor de Mercado (€)</label>
+                    <input type="text" id="market_value" name="market_value" required 
+                            placeholder="Ej: 180M o 500K"
+                            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                </div>
+                
+                <div>
+                    <label for="salary" class="block text-sm font-medium text-gray-700">Salario Semanal (€)</label>
+                    <input type="text" id="salary" name="salary" required 
+                            placeholder="Ej: 500K"
+                            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary">
+                </div>
+                
+                <button type="submit" class="w-full py-2 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200">
+                    Añadir Jugador
+                </button>
+            </form>
             
-            <div>
-                <label for="market_value" class="block text-sm font-medium text-gray-700">Valor de Mercado (€)</label>
-                <input type="text" id="market_value" name="valor" required placeholder="Ej: 5M o 100K"
-                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <form method="POST" action="{{ url_for('finalizar_plantilla') }}">
+                     <button type="submit" class="w-full py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200">
+                        Finalizar Plantilla (Temp 1)
+                    </button>
+                </form>
             </div>
+        </div>
 
-            <div>
-                <label for="salary" class="block text-sm font-medium text-gray-700">Salario Semanal (€)</label>
-                <input type="text" id="salary" name="salario" required placeholder="Ej: 50K"
-                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <button type="submit"
-                     class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-200 transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
-                Añadir Jugador
-            </button>
-        </form>
-        
-        <form method="POST" action="/finalizar_plantilla" class="mt-6">
-            <button type="submit"
-                    class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
-                Plantilla Completada (Finalizar Temporada 1)
-            </button>
-        </form>
-    </div>
-
-    <div class="lg:col-span-2">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Tu Plantilla Actual ({{ jugadores | length }})</h2>
-
-        {% if jugadores %}
-        <div class="overflow-x-auto bg-white rounded-xl shadow-2xl border border-gray-100">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nombre</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Posición</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">GRL</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Edad</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Valor (€)</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Salario (€)</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    {% for jugador in jugadores %}
-                    <tr class="hover:bg-gray-50 transition duration-150" data-player-id="{{ jugador.id }}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ jugador.nombre }}</td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {% if jugador.posicion in ['POR'] %} bg-blue-100 text-blue-800
-                                {% elif jugador.posicion in ['LI', 'LD', 'CAI', 'CAD', 'DFC'] %} bg-red-100 text-red-800
-                                {% elif jugador.posicion in ['MCD', 'MC', 'MCO', 'MI', 'MD'] %} bg-yellow-100 text-yellow-800
-                                {% elif jugador.posicion in ['EI', 'ED', 'DC', 'SD'] %} bg-green-100 text-green-800
+        <div class="lg:col-span-2">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center lg:text-left">Plantilla Actual ({{ players | length }} jugadores)</h2>
+            
+            {% if players %}
+            <div class="bg-white rounded-xl shadow-2xl overflow-x-auto border border-gray-100">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posición</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GRL</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salario Semanal</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for jugador in players %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ jugador.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-semibold">{{ jugador.position }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold 
+                                {% if jugador.grl >= 85 %} text-green-600 
+                                {% elif jugador.grl >= 75 %} text-yellow-600 
+                                {% else %} text-gray-500 
                                 {% endif %}">
-                                {{ jugador.posicion }}
-                            </span>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-center">
-                            <span class="
-                                {% if jugador.media | int < 50 %} text-red-600 
-                                {% elif jugador.media | int < 70 %} text-orange-500 
-                                {% elif jugador.media | int < 80 %} text-yellow-600 
-                                {% elif jugador.media | int < 85 %} text-lime-600 
-                                {% else %} text-green-700 
-                                {% endif %}">
-                                {{ jugador.media }}
-                            </span>
-                        </td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.edad }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.valor }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.salario }}</td>
-                        
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openEditModal('{{ jugador.id }}', '{{ jugador.nombre }}', '{{ jugador.posicion }}', '{{ jugador.media }}', '{{ jugador.edad }}', '{{ jugador.valor }}', '{{ jugador.salario }}')"
-                                    class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150 hover:underline">
-                                Modificar
-                            </button>
-                            <form method="POST" action="/eliminar/{{ jugador.id }}" class="inline-block" onsubmit="return confirm('¿Estás seguro de que quieres vender/eliminar a {{ jugador.nombre }}?')">
-                                <button type="submit"
-                                        class="text-red-600 hover:text-red-900 transition duration-150 hover:underline">
-                                    Eliminar
+                                {{ jugador.grl }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.age }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ jugador.market_value }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ jugador.salary }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                
+                                <button type="button"
+                                        onclick="openEditModal({{ jugador.id }}, '{{ jugador.name | safe }}', '{{ jugador.position }}', '{{ jugador.grl }}', '{{ jugador.age }}', '{{ jugador.market_value | safe }}', '{{ jugador.salary | safe }}')"
+                                        class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150">
+                                    Modificar
                                 </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                
+                                <form method="POST" 
+                                      action="{{ url_for('eliminar_jugador', player_id=jugador.id) }}" 
+                                      class="inline-block" 
+                                      onsubmit="return confirm('¿Estás seguro de que quieres vender/eliminar a {{ jugador.name }}?')">
+                                    <button type="submit"
+                                            class="text-red-600 hover:text-red-900 transition duration-150">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-6 bg-yellow-100 border border-yellow-200 text-yellow-800 rounded-xl shadow-lg text-center">
+                <p class="font-semibold">¡Tu plantilla está vacía! Usa el formulario de la izquierda para añadir tu primer jugador.</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg shadow-inner">
-            <p class="text-sm text-yellow-800">No tienes jugadores en tu plantilla. ¡Usa el formulario de la izquierda para fichar a tu primera estrella!</p>
-        </div>
-        {% endif %}
     </div>
 </div>
 
-<div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-2xl rounded-xl bg-white">
-        <h3 class="text-xl font-bold mb-4 border-b pb-2 text-indigo-700" id="editModalTitle">Modificar Jugador</h3>
+<div id="editModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
+            Modificar Jugador: <span id="editPlayerName" class="text-secondary"></span>
+        </h3>
         
         <form method="POST" action="" id="editPlayerForm" class="space-y-4">
-            <input type="hidden" name="action" value="update">
             
+            <input type="hidden" name="action" value="update">
+
             <div>
                 <label for="edit_position" class="block text-sm font-medium text-gray-700">Nueva Posición</label>
-                <select id="edit_position" name="posicion" required
-                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <select id="edit_position" name="position" required
+                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                     <option value="POR">Portero (POR)</option>
-                    <option value="CAI">Carrilero Izq. (CAI)</option>
-                    <option value="LI">Lateral Izq. (LI)</option>
-                    <option value="DFC">Defensa (DFC)</option>
-                    <option value="LD">Lateral Der. (LD)</option>
-                    <option value="CAD">Carrilero Der. (CAD)</option>
-                    <option value="MCD">Medio Defensivo (MCD)</option>
+                    <option value="LD">Lateral Derecho (LD)</option>
+                    <option value="DFC">Defensa Central (DFC)</option>
+                    <option value="LI">Lateral Izquierdo (LI)</option>
+                    <option value="MCD">Mediocentro Defensivo (MCD)</option>
                     <option value="MC">Mediocentro (MC)</option>
-                    <option value="MCO">Medio Ofensivo (MCO)</option>
-                    <option value="MI">Medio Izq. (MI)</option>
-                    <option value="MD">Medio Der. (MD)</option>
-                    <option value="EI">Extremo Izq. (EI)</option>
-                    <option value="DC">Delantero (DC)</option>
+                    <option value="MCO">Mediocentro Ofensivo (MCO)</option>
+                    <option value="MD">Interior Derecho (MD)</option>
+                    <option value="MI">Interior Izquierdo (MI)</option>
                     <option value="SD">Segundo Delantero (SD)</option>
-                    <option value="ED">Extremo Der. (ED)</option>
+                    <option value="DC">Delantero Centro (DC)</option>
+                    <option value="EI">Extremo Izquierdo (EI)</option>
+                    <option value="ED">Extremo Derecho (ED)</option>
+                    <option value="CAI">Carrilero Izquierdo (CAI)</option>
+                    <option value="CAD">Carrilero Derecho (CAD)</option>
                 </select>
-            </div>
-            
-            <div>
-                <label for="edit_grl" class="block text-sm font-medium text-gray-700">Nuevo GRL (1-99)</label>
-                <input type="number" id="edit_grl" name="media" required min="1" max="99" 
-                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div>
                 <label for="edit_age" class="block text-sm font-medium text-gray-700">Nueva Edad</label>
-                <input type="number" id="edit_age" name="edad" required min="16" max="45" 
-                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <input type="number" id="edit_age" name="age" required min="16" max="45"
+                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+            </div>
+
+            <div>
+                <label for="edit_grl" class="block text-sm font-medium text-gray-700">Nuevo GRL (1-99)</label>
+                <input type="number" id="edit_grl" name="grl" required min="1" max="99" 
+                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
             </div>
             
             <div>
                 <label for="edit_market_value" class="block text-sm font-medium text-gray-700">Nuevo Valor de Mercado (€)</label>
-                <input type="text" id="edit_market_value" name="valor" required placeholder="Ej: 5M o 100K"
-                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <input type="text" id="edit_market_value" name="market_value" required placeholder="Ej: 5M o 100K"
+                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
             </div>
-            
+
             <div>
                 <label for="edit_salary" class="block text-sm font-medium text-gray-700">Nuevo Salario Semanal (€)</label>
-                <input type="text" id="edit_salary" name="salario" required placeholder="Ej: 50K"
-                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <input type="text" id="edit_salary" name="salary" required placeholder="Ej: 50K"
+                        class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
             </div>
             
-            <div class="flex justify-end pt-4 border-t mt-4">
-                <button type="button" onclick="closeEditModal()"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2 transition duration-150">
+            <div class="flex justify-end pt-4 border-t mt-4 space-x-3">
+                <button type="button" onclick="closeEditModal()" 
+                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-150">
                     Cancelar
                 </button>
                 <button type="submit" 
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-150">
+                        class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
                     Guardar Cambios
                 </button>
             </div>
@@ -226,19 +219,33 @@
 </div>
 
 <script>
-    function openEditModal(playerId, playerName, position, media, edad, valor, salario) {
-        document.getElementById('editModalTitle').textContent = `Modificar a ${playerName}`;
-        document.getElementById('editPlayerForm').action = `/modificar/${playerId}`;
-        document.getElementById('edit_position').value = position;
-        document.getElementById('edit_grl').value = media;
+    /**
+     * Abre el modal de edición, precarga los datos del jugador y establece la URL de acción del formulario.
+     */
+    function openEditModal(id, nombre, posicion, grl, edad, valor, salario) {
+        // Rellenar los campos del modal
+        document.getElementById('editPlayerName').textContent = nombre;
+        document.getElementById('edit_position').value = posicion;
+        document.getElementById('edit_grl').value = grl;
         document.getElementById('edit_age').value = edad;
         document.getElementById('edit_market_value').value = valor;
         document.getElementById('edit_salary').value = salario;
+        
+        // Establecer la acción del formulario con la URL dinámica de Flask
+        // Usamos una plantilla de Jinja para obtener la ruta base y luego reemplazamos el placeholder.
+        const formActionUrl = "{{ url_for('actualizar_jugador', player_id='_PLAYER_ID_') }}".replace('_PLAYER_ID_', id);
+        document.getElementById('editPlayerForm').action = formActionUrl;
+        
+        // Mostrar el modal
         document.getElementById('editModal').classList.remove('hidden');
     }
 
+    /**
+     * Cierra el modal de edición.
+     */
     function closeEditModal() {
         document.getElementById('editModal').classList.add('hidden');
     }
 </script>
+
 {% endblock %}
