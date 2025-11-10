@@ -5,19 +5,14 @@
 {% block content %}
 <h1 class="text-4xl font-extrabold text-gray-900 mb-8 border-b pb-2">Gestión de Plantilla</h1>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="{% if category == 'success' %}bg-green-100 border-green-400 text-green-700{% elif category == 'error' %}bg-red-100 border-red-400 text-red-700{% endif %} px-4 py-3 rounded-lg border mb-6 text-sm font-medium" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+{% if message %}
+<div class="{% if '✅' in message %}bg-green-100 border-green-400 text-green-700{% elif '⚠️' in message %}bg-yellow-100 border-yellow-400 text-yellow-700{% else %}bg-red-100 border-red-400 text-red-700{% endif %} px-4 py-3 rounded-lg border mb-6 text-sm font-medium" role="alert">
+    {{ message }}
+</div>
+{% endif %}
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     
-    <!-- FORMULARIO AÑADIR JUGADOR -->
     <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-2xl h-fit sticky top-6 border border-gray-100">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2 text-blue-600">Añadir Nuevo Jugador</h2>
         
@@ -25,7 +20,7 @@
             
             <div>
                 <label for="position" class="block text-sm font-medium text-gray-700">Posición</label>
-                <select id="position" name="position" required
+                <select id="position" name="posicion" required
                         class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150">
                     <option value="POR">Portero (POR)</option>
                     <option value="CAI">Carrilero Izq. (CAI)</option>
@@ -47,31 +42,31 @@
 
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Nombre del Jugador</label>
-                <input type="text" id="name" name="name" required
+                <input type="text" id="name" name="nombre" required
                         class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div>
                 <label for="age" class="block text-sm font-medium text-gray-700">Edad</label>
-                <input type="number" id="age" name="age" required min="16" max="45"
+                <input type="number" id="age" name="edad" required min="16" max="45"
                         class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div>
                 <label for="grl" class="block text-sm font-medium text-gray-700">GRL (0-99)</label>
-                <input type="number" id="grl" name="grl" required min="1" max="99"
+                <input type="number" id="grl" name="media" required min="1" max="99"
                         class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
             
             <div>
                 <label for="market_value" class="block text-sm font-medium text-gray-700">Valor de Mercado (€)</label>
-                <input type="text" id="market_value" name="market_value" required placeholder="Ej: 5M o 100K"
+                <input type="text" id="market_value" name="valor" required placeholder="Ej: 5M o 100K"
                         class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div>
                 <label for="salary" class="block text-sm font-medium text-gray-700">Salario Semanal (€)</label>
-                <input type="text" id="salary" name="salary" required placeholder="Ej: 50K"
+                <input type="text" id="salary" name="salario" required placeholder="Ej: 50K"
                         class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
 
@@ -89,7 +84,6 @@
         </form>
     </div>
 
-    <!-- LISTADO DE JUGADORES -->
     <div class="lg:col-span-2">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Tu Plantilla Actual ({{ jugadores | length }})</h2>
 
@@ -110,42 +104,42 @@
                 <tbody class="divide-y divide-gray-200">
                     {% for jugador in jugadores %}
                     <tr class="hover:bg-gray-50 transition duration-150" data-player-id="{{ jugador.id }}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ jugador.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ jugador.nombre }}</td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {% if jugador.position in ['POR'] %} bg-blue-100 text-blue-800
-                                {% elif jugador.position in ['LI', 'LD', 'CAI', 'CAD', 'DFC'] %} bg-red-100 text-red-800
-                                {% elif jugador.position in ['MCD', 'MC', 'MCO', 'MI', 'MD'] %} bg-yellow-100 text-yellow-800
-                                {% elif jugador.position in ['EI', 'ED', 'DC', 'SD'] %} bg-green-100 text-green-800
+                                {% if jugador.posicion in ['POR'] %} bg-blue-100 text-blue-800
+                                {% elif jugador.posicion in ['LI', 'LD', 'CAI', 'CAD', 'DFC'] %} bg-red-100 text-red-800
+                                {% elif jugador.posicion in ['MCD', 'MC', 'MCO', 'MI', 'MD'] %} bg-yellow-100 text-yellow-800
+                                {% elif jugador.posicion in ['EI', 'ED', 'DC', 'SD'] %} bg-green-100 text-green-800
                                 {% endif %}">
-                                {{ jugador.position }}
+                                {{ jugador.posicion }}
                             </span>
                         </td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-center">
                             <span class="
-                                {% if jugador.grl < 50 %} text-red-600 
-                                {% elif jugador.grl < 70 %} text-orange-500 
-                                {% elif jugador.grl < 80 %} text-yellow-600 
-                                {% elif jugador.grl < 85 %} text-lime-600 
+                                {% if jugador.media | int < 50 %} text-red-600 
+                                {% elif jugador.media | int < 70 %} text-orange-500 
+                                {% elif jugador.media | int < 80 %} text-yellow-600 
+                                {% elif jugador.media | int < 85 %} text-lime-600 
                                 {% else %} text-green-700 
                                 {% endif %}">
-                                {{ jugador.grl }}
+                                {{ jugador.media }}
                             </span>
                         </td>
                         
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.age }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.market_value }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.salary }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.edad }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.valor }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ jugador.salario }}</td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openEditModal('{{ jugador.id }}', '{{ jugador.name }}', '{{ jugador.position }}', '{{ jugador.grl }}', '{{ jugador.age }}', '{{ jugador.market_value }}', '{{ jugador.salary }}')"
+                            <button onclick="openEditModal('{{ jugador.id }}', '{{ jugador.nombre }}', '{{ jugador.posicion }}', '{{ jugador.media }}', '{{ jugador.edad }}', '{{ jugador.valor }}', '{{ jugador.salario }}')"
                                     class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150 hover:underline">
                                 Modificar
                             </button>
-                            <form method="POST" action="/eliminar_jugador/{{ jugador.id }}" class="inline-block" onsubmit="return confirm('¿Estás seguro de que quieres vender/eliminar a {{ jugador.name }}?')">
-                                <button type="submit" name="action" value="delete"
+                            <form method="POST" action="/eliminar/{{ jugador.id }}" class="inline-block" onsubmit="return confirm('¿Estás seguro de que quieres vender/eliminar a {{ jugador.nombre }}?')">
+                                <button type="submit"
                                         class="text-red-600 hover:text-red-900 transition duration-150 hover:underline">
                                     Eliminar
                                 </button>
@@ -164,7 +158,6 @@
     </div>
 </div>
 
-<!-- MODAL MODIFICAR JUGADOR -->
 <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-2xl rounded-xl bg-white">
         <h3 class="text-xl font-bold mb-4 border-b pb-2 text-indigo-700" id="editModalTitle">Modificar Jugador</h3>
@@ -174,7 +167,7 @@
             
             <div>
                 <label for="edit_position" class="block text-sm font-medium text-gray-700">Nueva Posición</label>
-                <select id="edit_position" name="position" required
+                <select id="edit_position" name="posicion" required
                         class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
                     <option value="POR">Portero (POR)</option>
                     <option value="CAI">Carrilero Izq. (CAI)</option>
@@ -196,25 +189,25 @@
             
             <div>
                 <label for="edit_grl" class="block text-sm font-medium text-gray-700">Nuevo GRL (1-99)</label>
-                <input type="number" id="edit_grl" name="grl" required min="1" max="99" 
+                <input type="number" id="edit_grl" name="media" required min="1" max="99" 
                         class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
             </div>
 
             <div>
                 <label for="edit_age" class="block text-sm font-medium text-gray-700">Nueva Edad</label>
-                <input type="number" id="edit_age" name="age" required min="16" max="45" 
+                <input type="number" id="edit_age" name="edad" required min="16" max="45" 
                         class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
             </div>
             
             <div>
                 <label for="edit_market_value" class="block text-sm font-medium text-gray-700">Nuevo Valor de Mercado (€)</label>
-                <input type="text" id="edit_market_value" name="market_value" required placeholder="Ej: 5M o 100K"
+                <input type="text" id="edit_market_value" name="valor" required placeholder="Ej: 5M o 100K"
                         class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
             </div>
             
             <div>
                 <label for="edit_salary" class="block text-sm font-medium text-gray-700">Nuevo Salario Semanal (€)</label>
-                <input type="text" id="edit_salary" name="salary" required placeholder="Ej: 50K"
+                <input type="text" id="edit_salary" name="salario" required placeholder="Ej: 50K"
                         class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
             </div>
             
@@ -233,14 +226,14 @@
 </div>
 
 <script>
-    function openEditModal(playerId, playerName, position, grl, age, marketValue, salary) {
+    function openEditModal(playerId, playerName, position, media, edad, valor, salario) {
         document.getElementById('editModalTitle').textContent = `Modificar a ${playerName}`;
-        document.getElementById('editPlayerForm').action = `/actualizar_jugador/${playerId}`;
+        document.getElementById('editPlayerForm').action = `/modificar/${playerId}`;
         document.getElementById('edit_position').value = position;
-        document.getElementById('edit_grl').value = grl;
-        document.getElementById('edit_age').value = age;
-        document.getElementById('edit_market_value').value = marketValue;
-        document.getElementById('edit_salary').value = salary;
+        document.getElementById('edit_grl').value = media;
+        document.getElementById('edit_age').value = edad;
+        document.getElementById('edit_market_value').value = valor;
+        document.getElementById('edit_salary').value = salario;
         document.getElementById('editModal').classList.remove('hidden');
     }
 
