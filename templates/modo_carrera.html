@@ -140,7 +140,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ player.salary }}</td>
                         
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openEditModal('{{ player.id }}', '{{ player.name }}')"
+                            <button onclick="openEditModal('{{ player.id }}', '{{ player.name }}', '{{ player.position }}', '{{ player.grl }}', '{{ player.age }}', '{{ player.market_value }}', '{{ player.salary }}')"
                                     class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150 hover:underline">
                                 Modificar
                             </button>
@@ -214,7 +214,7 @@
             <div>
                 <label for="edit_salary" class="block text-sm font-medium text-gray-700">Nuevo Salario Semanal (€)</label>
                 <input type="text" id="edit_salary" name="salary" required placeholder="Ej: 50K"
-                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        class="mt-1 w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:focus:border-blue-500">
             </div>
             
             <div class="flex justify-end pt-4 border-t mt-4">
@@ -232,21 +232,19 @@
 </div>
 
 <script>
-    // Función de ayuda para simular la apertura de datos. 
-    // En producción, usarías una llamada AJAX para obtener los datos del jugador.
-    function openEditModal(playerId, playerName) {
-        // En un caso real, obtendrías los datos del jugador por ID para rellenar los campos.
-        // Aquí solo actualizamos la interfaz para el ejemplo.
+    function openEditModal(playerId, playerName, position, grl, age, marketValue, salary) {
+        // 1. Configurar el título y la acción del formulario
         document.getElementById('editModalTitle').textContent = `Modificar a ${playerName}`;
-        
-        // Simulación: Asigna la acción del formulario al endpoint de actualización
         document.getElementById('editPlayerForm').action = `/actualizar_jugador/${playerId}`;
         
-        // Simulación: Rellenar campos (esto debe hacerse con datos reales del servidor)
-        document.getElementById('edit_grl').value = 75; // Ejemplo de GRL actual
-        document.getElementById('edit_age').value = 25; // Ejemplo de Edad actual
-        // ... (otros campos) ...
+        // 2. Rellenar los campos del modal con los datos actuales del jugador
+        document.getElementById('edit_position').value = position;
+        document.getElementById('edit_grl').value = grl;
+        document.getElementById('edit_age').value = age;
+        document.getElementById('edit_market_value').value = marketValue;
+        document.getElementById('edit_salary').value = salary;
 
+        // 3. Mostrar el modal
         document.getElementById('editModal').classList.remove('hidden');
     }
 
